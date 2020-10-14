@@ -73,38 +73,71 @@ const FoodDetails: React.FC = () => {
 
   useEffect(() => {
     async function loadFood(): Promise<void> {
+      const { id } = routeParams;
       // Load a specific food with extras based on routeParams id
+      const result = await api.get<Food>(`/food/${id}`);
+      setFood(result.data);
+      setExtras(food.extras);
     }
 
     loadFood();
   }, [routeParams]);
 
   function handleIncrementExtra(id: number): void {
-    // Increment extra quantity
+    const found = extras.findIndex(e => e.id === id);
+    if(found){
+      extras[found].quantity += 1;
+      setExtras([ ...extras]);
+    }
   }
 
   function handleDecrementExtra(id: number): void {
-    // Decrement extra quantity
+    const found = extras.findIndex(e => e.id === id);
+    if(found){
+      extras[found].quantity -= 1;
+      setExtras([ ...extras]);
+    }
   }
 
   function handleIncrementFood(): void {
-    // Increment food quantity
+    setFoodQuantity(qty => qty + 1);
   }
 
   function handleDecrementFood(): void {
-    // Decrement food quantity
+    setFoodQuantity(qty => qty - 1);
   }
 
   const toggleFavorite = useCallback(() => {
-    // Toggle if food is favorite or not
+    async function handleFavorites(){
+      if(isFavorite){
+        await api.delete(`/favorites/${food.id}`);
+      }else{
+        await api.post(`/favorites`, food);
+      }
+      setIsFavorite( state => !state);
+    }
+    handleFavorites();
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
-    // Calculate cartTotal
+    let extraPrices = 0;
+    extras.forEach(extra => {
+      extraPrices += extra.quantity + extra.value;
+    });
+    return (food.price + extraPrices) * foodQuantity;
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {
     // Finish the order and save on the API
+    const order = {
+      ...food,
+      extras: [ ... extras],
+      id: undefined,
+      product_id: food.id
+    }
+    for(let i = foodQuantity; i > 0; i--){
+      await api.post('/orders', order);
+    }
   }
 
   // Calculate the correct icon name
