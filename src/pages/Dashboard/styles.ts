@@ -61,6 +61,7 @@ export const CategoryItem = styled.TouchableOpacity<CategoryItemProps>`
       background-color: #ffebeb;
     `}
 `;
+CategoryItem.displayName = 'CategoryItem';
 
 export const CategoryItemTitle = styled.Text`
   font-style: normal;
@@ -71,14 +72,18 @@ export const CategoryItemTitle = styled.Text`
   color: #6c6c80;
 `;
 
+CategoryItemTitle.displayName = 'CategoryItemTitle';
+
 export const FoodsContainer = styled.View`
   margin-top: 40px;
+  flex-direction: column;
 `;
 
 export const FoodList = styled.View`
   flex: 1;
   padding: 0 20px;
   margin-top: 16px;
+  flex-direction: column;
 `;
 
 export const Food = styled.TouchableOpacity`
